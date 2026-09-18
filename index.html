@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onchain Wallet — How It Works</title>
+<meta name="description" content="Learn about the Onchain Wallet, self-custody, security, recovery and Web3 features.">
+<style>
+:root{
+  --navy:#07101f;
+  --navy2:#0b1b32;
+  --blue:#1497f5;
+  --blue-dark:#087ed8;
+  --text:#071a38;
+  --body:#4f5968;
+  --muted:#707988;
+  --line:#e3e7ed;
+  --soft:#f7f8fa;
+  --white:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#fff;color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.7}
+body.modal-open{overflow:hidden}
+a{text-decoration:none;color:inherit}
+.container{width:min(1120px,92%);margin:auto}
+
+/* HEADER */
+.site-header{background:var(--navy);color:#fff}
+.nav{height:82px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:28px;font-weight:900;letter-spacing:-1.2px;color:#fff}
+.nav-right{display:flex;align-items:center;gap:14px}
+.signup{background:var(--blue);color:#fff;padding:14px 31px;border-radius:999px;font-weight:800;font-size:15px}
+.menu-btn{width:50px;height:50px;border:1px solid #344055;border-radius:50%;background:transparent;color:#fff;font-size:26px;cursor:pointer}
+
+/* ARTICLE HERO */
+.article-hero{padding:46px 0 35px;background:#fff}
+.breadcrumb{font-size:13px;color:#7a8290;margin-bottom:22px}
+.breadcrumb a{color:var(--blue)}
+.article-hero h1{font-size:clamp(40px,6vw,68px);line-height:1.06;letter-spacing:-2.8px;max-width:930px;margin:0 0 20px;color:#071a38}
+.intro{font-size:19px;line-height:1.7;max-width:850px;color:#5d6674;margin:0 0 18px}
+.meta{font-size:13px;color:#7b8491}
+
+/* IMAGE PLACEHOLDER */
+.hero-image-wrap{padding:12px 0 50px}
+.image-placeholder{
+  width:100%;min-height:360px;border:2px dashed #bfc6d0;border-radius:20px;
+  background:#f4f6f8;display:flex;align-items:center;justify-content:center;
+  text-align:center;color:#6d7683;overflow:hidden
+}
+.image-placeholder .inner strong{display:block;font-size:17px;color:#596270}
+.image-placeholder .inner span{display:block;font-size:13px;margin-top:7px}
+.image-placeholder .plus{font-size:40px;line-height:1;color:var(--blue);margin-bottom:8px}
+
+/* RISK NOTICE */
+.risk-banner{background:var(--navy2);color:#eef3fb;padding:26px 0}
+.risk-banner p{margin:0;font-size:18px;line-height:1.55}
+
+/* CONTENT */
+.page-grid{display:grid;grid-template-columns:235px minmax(0,760px);gap:55px;padding:58px 0}
+.toc{position:sticky;top:20px;height:max-content;border:1px solid var(--line);border-radius:14px;padding:20px;background:#fff}
+.toc-title{font-weight:800;color:var(--text);margin-bottom:9px}
+.toc a{display:block;padding:6px 0;color:#697280;font-size:13px}
+.toc a:hover{color:var(--blue)}
+article h2{font-size:35px;line-height:1.18;letter-spacing:-1px;color:var(--text);margin:0 0 18px;padding-top:8px}
+article h3{font-size:22px;line-height:1.3;color:var(--text);margin:32px 0 10px}
+article p,article li{color:var(--body);font-size:16px}
+article ul,article ol{padding-left:25px}
+article section{margin-bottom:62px}
+.divider{border:0;border-top:1px solid var(--line);margin:42px 0}
+
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:25px 0}
+.info-card{background:var(--soft);border:1px solid var(--line);border-radius:15px;padding:22px}
+.info-card h3{margin:0 0 7px;font-size:18px}
+.info-card p{margin:0;font-size:14px}
+
+.content-image{margin:28px 0}
+.content-image .image-placeholder{min-height:270px}
+
+.compare{width:100%;border-collapse:collapse;margin:25px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.compare th,.compare td{text-align:left;padding:15px;border-bottom:1px solid var(--line)}
+.compare th{background:#f5f7f9;color:var(--text)}
+.compare td{color:var(--body)}
+.compare tr:last-child td{border-bottom:0}
+
+.warning{background:#fff7e8;border-left:4px solid #f1a900;padding:18px 20px;border-radius:8px;margin:24px 0}
+.warning p{margin:0;color:#66532b;font-size:14px}
+
+.cta{background:var(--soft);border:1px solid var(--line);border-radius:20px;padding:35px;margin:10px 0 65px;text-align:center}
+.cta h2{padding:0;margin:0 0 10px}
+.cta p{max-width:680px;margin:0 auto 22px}
+.transfer-btn{border:0;background:var(--blue);color:#fff;padding:16px 32px;border-radius:999px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 22px rgba(20,151,245,.18)}
+.transfer-btn:hover{background:var(--blue-dark)}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-question{width:100%;border:0;background:#fff;padding:22px 42px 22px 0;text-align:left;font-size:18px;font-weight:800;color:var(--text);cursor:pointer;position:relative}
+.faq-question:after{content:"+";position:absolute;right:5px;top:17px;font-size:28px;font-weight:400;color:#697280}
+.faq-item.open .faq-question:after{content:"−"}
+.faq-answer{display:none;padding:0 45px 20px 0}
+.faq-item.open .faq-answer{display:block}
+.faq-answer p{margin:0;font-size:15px}
+
+/* FOOTER */
+.site-footer{background:var(--navy);color:#9ca9bd;padding:60px 0 20px}
+.footer-grid{display:grid;grid-template-columns:1.35fr .7fr 1.2fr;gap:55px}
+.footer-logo{color:#fff;font-size:27px;font-weight:900;margin-bottom:12px}
+.site-footer h3{color:#fff;font-size:15px;margin:0 0 12px}
+.site-footer p,.site-footer a{font-size:13px;line-height:1.8}
+.site-footer a{display:block;color:#b8c3d4;margin:6px 0}
+.site-footer a:hover{color:#fff}
+.footer-bottom{border-top:1px solid #1c2b42;margin-top:42px;padding-top:18px;display:flex;justify-content:space-between;gap:20px;font-size:11px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(3,9,19,.75);display:flex;align-items:center;justify-content:center;padding:18px;z-index:1000;opacity:0;visibility:hidden;transition:.2s}
+.modal-overlay.show{opacity:1;visibility:visible}
+.transfer-modal{width:min(720px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:20px;padding:30px;position:relative;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.modal-close{position:absolute;right:15px;top:10px;background:transparent;border:0;color:#6c7480;font-size:32px;cursor:pointer}
+.transfer-modal h2{margin:0 35px 5px 0;font-size:29px;color:var(--text)}
+.modal-intro{margin:0 0 22px;color:#697280;font-size:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.form-grid label{font-size:13px;font-weight:700;color:#27303d}
+.form-grid .full{grid-column:1/-1}
+.form-grid input,.form-grid select,.form-grid textarea{
+  display:block;width:100%;margin-top:7px;padding:12px 13px;border:1px solid #d5dbe3;border-radius:10px;
+  background:#fff;color:#111827;font:inherit;outline:none
+}
+.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(20,151,245,.1)}
+.check{display:flex;gap:9px;align-items:flex-start;margin:18px 0;font-size:12px;color:#5d6672}
+.submit{width:100%;border:0;border-radius:10px;background:var(--blue);color:#fff;padding:13px;font-weight:800;cursor:pointer}
+.form-note{text-align:center;font-size:11px;color:#7b8390;margin:10px 0 0}
+.success{text-align:center;padding:20px}
+.success h3{margin:5px 0;color:var(--text)}
+.success p{color:var(--body);font-size:14px}
+
+/* MOBILE */
+@media(max-width:850px){
+  .page-grid{grid-template-columns:1fr}
+  .toc{position:static}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+}
+@media(max-width:600px){
+  .nav{height:70px}
+  .brand{font-size:23px}
+  .signup{padding:11px 18px;font-size:13px}
+  .menu-btn{width:44px;height:44px}
+  .article-hero{padding-top:35px}
+  .article-hero h1{letter-spacing:-1.8px}
+  .intro{font-size:17px}
+  .image-placeholder{min-height:220px}
+  .risk-banner p{font-size:15px}
+  .page-grid{padding:40px 0}
+  article h2{font-size:29px}
+  .info-grid,.form-grid{grid-template-columns:1fr}
+  .form-grid .full{grid-column:auto}
+  .footer-bottom{flex-direction:column}
+}
+  .article-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 18px;
+    object-fit: cover;
+}
+</style>
+</head>
+
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="#">ONCHAIN</a>
+    <div class="nav-right">
+      <a class="signup" href="#start">Get Started</a>
+    </div>
+  </div>
+</header>
+
+<section class="article-hero">
+  <div class="container">
+     <h1>What is the Crypto.com Onchain Wallet and how does it work?</h1>
+    <h2>Introduction</h2>
+    <p class="intro">
+      Crypto.com’s Onchain Wallet gives you full control of your crypto while also supporting a wide range of tokens and DeFi features. Discover how it works, how to set your wallet up and why it differs from the custodial Crypto.com App wallet.
+    </p> 
+  </div>
+</section>
+
+<!-- IMAGE PLACEHOLDER FOR THE MAIN ARTICLE IMAGE -->
+<section class="hero-image-wrap">
+  <div class="container">
+    <div class="image-placeholder" role="img" aria-label="Main article image placeholder">
+      <div class="inner">
+        <div class="plus">
+        <img src="image1.webp" alt="Onchain Wallet" class="article-image">
+      </div>
+    </div>
+  </div>
+</section>
+  
+<main class="container page-grid">
+  </aside>
+  <article>
+    <section id="getting-started">
+      <h2>Getting started with Onchain Wallet</h2>
+      <p>Getting to grips with cryptocurrency wallets can feel overwhelming, especially as a beginner when you're deciding between custodial and non-custodial options.&nbsp;</p>
+      <p>If you're exploring self-custody solutions, Crypto.com's Onchain Wallet (formerly known as the DeFi Wallet) offers a blend of user-friendly design and advanced Web3 functionality. But it’s one of several options and isn’t the right choice for everyone.</p>
+      <p>In this comprehensive guide, we'll walk you through everything you need to know about our Onchain Wallet, from its core features and security measures to how it stacks up against popular alternatives like MetaMask and Coinbase Wallet.&nbsp;</p>
+      <p></p>
+      <hr> </section>
+    
+    <section id="what-is">     
+      <h2>What is Onchain Wallet?</h2>
+      <p>Crypto.com’s Onchain Wallet is a non-custodial cryptocurrency wallet that puts you in complete control of your digital assets. Unlike traditional exchange wallets where a third party holds your private keys, Onchain Wallet generates and stores your private keys directly on your device, giving you full ownership and control over your cryptocurrencies.</p>
+      <p>As a multi-chain hot wallet, Onchain Wallet supports interactions across multiple <a href="https://crypto.com/uk/university/what-is-blockchain-consensus" rel="noopener noreferrer" target="_blank"><span style="text-decoration: underline;">blockchain</span></a> networks, making it easy to manage diverse crypto portfolios. The wallet functions as both a standalone mobile app and as a browser extension for browsers, providing flexibility for both mobile and desktop users.</p>
+      <p>But what really sets Onchain Wallet apart as a decentralised wallet is its integration with Web3 decentralised applications (dApps), decentralised exchanges and decentralised finance (DeFi) protocols. This means you can participate in the broader decentralised ecosystem (including token swaps, yield farming and NFT trading) all while maintaining control over your private keys.</p>
+      <p>The wallet doesn't require a Crypto.com account to function, though having one can unlock additional features like fiat purchasing options.</p>
+      <p><br></p>
+      
+      <div class="content-image">
+        <div class="image-placeholder" role="img" aria-label="Wallet interface image placeholder">
+          <div class="inner"><div class="plus">
+<img src="image2.webp" alt="Onchain Wallet" class="article-image">
+   
+     </div>
+      </div>
+    </section>
+
+    <section id="how-it-works">
+      <h2>How does the Onchain Wallet work?</h2>
+      <div class="wide-image-container flex w-full flex-col ">
+       <div></div>
+       <div></div>
+       <div class="wide-image-caption line-clamp-2 w-full px-5 text-xs tracking-[0.6px] md:max-w-full md:p-0"></div>
+      
+      <p>Onchain Wallet works on the principle of local private key generation. When you create a new wallet, it generates your private keys directly on your device using industry standard cryptographic protocols. These keys never leave your device unless you explicitly export them, ensuring that only you have access to your funds.</p>
+      <p>The wallet uses a BIP-39 recovery phrase (commonly called a seed phrase) consisting of 12, 18 or 24 words that serves as the master key to your cryptocurrency holdings by mathematically generating all your private keys and wallet addresses across different blockchain networks. If you ever lose access to your device, this phrase enables you to restore your entire wallet and regain access to your funds.</p>
+      <p>Multi-chain functionality is built into the wallet's core architecture. You can seamlessly switch between supported networks including <a href="https://crypto.com/price/ethereum" rel="noopener noreferrer" target="_blank"><span style="text-decoration: underline;">Ethereum</span></a>, <a href="https://crypto.com/price/bitcoin" rel="noopener noreferrer" target="_blank"><span style="text-decoration: underline;">Bitcoin</span></a>, Solana and Cronos without creating separate wallets, because the interface automatically detects which network you're working on.</p>
+      <p>Key security features include device level encryption, biometric authentication (such as Face ID), and optional two factor authentication. For users seeking increased security, the wallet supports pairing with hardware wallets like Ledgers, combining the convenience of a hot wallet with the security of cold storage.</p>
+      <p>When you’re sending or receiving cryptocurrencies, the wallet connects directly to blockchain networks, allowing you to view real time balances, transaction histories and network fees.&nbsp;</p>
+      <p>Built-in token swap functionality lets you exchange cryptocurrencies without leaving the wallet interface, while dApp integration enables you to easily interact with decentralised applications.</p>
+      <p><br></p>
+      <hr>
+    </section>
+
+    <section id="benefits">
+      <h3>Onchain Wallet benefits</h3>
+      <p>Key advantages of our Onchain Wallet include:</p>
+      <ul class="list-bullet">
+       <li class="" value="1"><strong>Full ownership and control</strong> – unlike "custodial wallets </span></a> where exchanges or companies control your private keys, you maintain complete ownership of your cryptocurrency assets. This means no third party can freeze your account, restrict your transactions or lose your funds due to their own security failures.</li>
+       <li class="" value="2"><strong>Access to DeFi and Web3 ecosystem</strong> – it opens up opportunities beyond simple sending and receiving crypto. You can participate in yield farming, provide liquidity to decentralised exchanges, stake tokens for rewards, trade NFTs or interact with thousands of decentralised applications. This level of access is typically impossible with traditional custodial wallets.&nbsp;</li>
+       <li class="" value="3"><strong>Multi-chain flexibility</strong> – eliminates the need for multiple wallet applications. Whether you're trading Ethereum-based tokens, holding Bitcoin or exploring Solana DeFi projects, Onchain Wallet manages assets across all major blockchain networks from a single interface.</li>
+       <li class="" value="4"><strong>Increased privacy and security</strong> – come naturally with non-custodial architecture. Your transaction history and wallet balances aren't stored on centralised servers, reducing the risk of large scale data breaches. Since private keys remain on your device, you're not vulnerable to exchange hacks.&nbsp;</li>
+       <li class="" value="5"><strong>No account requirements</strong> – meaning you can start using Onchain Wallet immediately without providing personal information, undergoing identity verification or creating an account with a centralised service. This aligns with cryptocurrency's core principle of financial sovereignty.&nbsp;<br></li>
+      </ul>
+      
+    </section>
+      <div class="content-image">
+        <div class="image-placeholder" role="img" aria-label="Wallet security image placeholder">
+          <div class="inner"><div class="plus">    
+            <img src="image3.webp" alt="Onchain Wallet" class="article-image">
+          </div>
+           </div>
+      </div>
+    </section>
+      
+    <section id="supported">
+      <h2>Onchain Wallet Supported Cryptocurrencies</h2>
+      <p>Wallet support depends on the networks and tokens implemented by the particular wallet version. Common blockchain ecosystems can include Bitcoin, Ethereum, Solana and other compatible networks.</p>
+      <p>Always check the selected network before sending an asset. A token sent through an incompatible network may not arrive as expected and recovery can be difficult or impossible.</p>
+    </section>
+
+    <section id="security">
+       <h2>Security and safety: Is Onchain Wallet safe?</h2>
+      <p>As with all wallets, there are trade-offs to consider. Onchain Wallet hosts a comprehensive security framework to protect user funds and private keys. However, like all hot wallets, it carries inherent risks:</p>
+      <ul class="list-bullet">
+       <li class="" value="1"><strong>Device-level security</strong> – Advanced encryption protocols that help to protect your private keys and recovery phrases while stored on your device. The wallet uses secure hardware elements available on modern smartphones and implements biometric authentication (fingerprint or Face ID) alongside traditional PIN protection.</li>
+       <li class="" value="2"><strong>Two-factor authentication (2FA)</strong> – Adds an additional layer of protection for both wallet access and transaction signing. Users can enable 2FA through authenticator apps, which help to protect you from unauthorised access even if your password is compromised.</li>
+       <li class="" value="3"><strong>Hardware wallet integration</strong> – Represents the highest level of security available. Onchain Wallet supports pairing with Ledger hardware devices, allowing you to manage assets through the wallet’s interface while keeping private keys securely stored on dedicated hardware that never connects to the internet.</li>
+       <li class="" value="4"><strong>Open source transparency and audits</strong> – The wallet’s open source components and regular security audits provide users with additional confidence. However, self-custody still means taking full responsibility for following good security practices.</li>
+      </ul>
+      <p>As a hot wallet, Onchain Wallet stores private keys on internet connected devices, making it theoretically more vulnerable to malware compared to hardware only solutions.</p>
+      <p>Best security practices include keeping your recovery phrase written down and stored offline, using a hardware wallet pairing for significant holdings, enabling all available security features, keeping your device operating system updated and avoiding accessing your wallet on public WiFi networks.</p>
+      <p><br></p>
+      <hr>
+
+    <section id="wallet-types">
+      <h2>Centralised vs decentralised wallets: What’s the difference?</h2>
+      <p>Understanding the fundamental differences between centralised and decentralised wallets is important for choosing the right storage solution for your cryptocurrency needs.</p>
+      <p>Centralised (custodial) wallets are managed by third-party companies including exchanges. With these wallets, the company holds and controls your private keys, meaning they technically own your cryptocurrency on your behalf.&nbsp;</p>
+      <p>Key characteristics of centralised wallets include:</p>
+      <ul class="list-bullet">
+       <li class="" value="1">Company controls private keys and funds</li>
+       <li class="" value="2">Account recovery through customer support</li>
+       <li class="" value="3">Built-in fiat onramps and easy purchasing</li>
+       <li class="" value="4">FDIC insurance available in some jurisdictions</li>
+       <li class="" value="5">Simplified user experience with customer support</li>
+       <li class="" value="6">Vulnerable to company failures or regulatory actions</li>
+      </ul>
+      <p>Decentralised (non-custodial) wallets like Onchain Wallet give you complete control over your private keys and funds. You're essentially your own bank, with full ownership and responsibility for your cryptocurrency assets.</p>
+      <p>Key characteristics of decentralised wallets include:</p>
+      <ul class="list-bullet">
+       <li class="" value="1">User controls private keys and funds</li>
+       <li class="" value="2">Self-reliant recovery through seed phrases</li>
+       <li class="" value="3">Direct blockchain interactions and DeFi access</li>
+       <li class="" value="4">No insurance against user errors or loss</li>
+       <li class="" value="5">Greater privacy and censorship resistance</li>
+       <li class="" value="6">Higher technical responsibility and learning curve</li>
+      </ul>
+      <p>The key trade-off between the two wallet types is convenience versus control. Centralised wallets offer simplicity, customer support and protection against user errors, but require trusting third parties with your funds. Decentralised wallets provide maximum control and privacy but require users to be responsible for their own security.</p>
+      <p><br></p>
+      <hr>
+    </section>
+
+    <section id="recovery">
+      <h2>Crypto.com app vs Onchain Wallet: What’s the difference?</h2>
+      <p>We offer two distinct wallet solutions that serve different user needs and represent different approaches to cryptocurrency management.&nbsp;</p>
+      <p>Our Crypto.com App (custodial) functions as a traditional centralised exchange and wallet service. We hold your private keys and manage your cryptocurrency on your behalf, similar to how banks manage traditional money. This prioritises simplicity and convenience, making it ideal for users who want straightforward buying, selling and basic cryptocurrency management.</p>
+      <p>Onchain Wallet (non-custodial) operates as a self-custody solution where you control your private keys and take full responsibility for your funds. This approach prioritises control and access to advanced features like DeFi protocols and dApps.</p>
+      <div class="wide-image-container flex w-full flex-col ">
+       <div></div>
+       <div></div>
+       <div class="wide-image-caption line-clamp-2 w-full px-5 text-xs tracking-[0.6px] md:max-w-full md:p-0"></div>
+      </div>
+      <p><br></p>
+      <p>The Crypto.com App works well for users who want simple cryptocurrency investing, regular buying and selling, and don't mind trusting a company with their funds. Onchain Wallet suits users who want to participate in DeFi, maintain complete control over their assets and don't need extensive customer support.</p>
+      <p>Many use the App for simple purchases and long-term holdings, and the Onchain Wallet for DeFi activities and self-custody storage. The platforms can work together, with users transferring funds between them based on their immediate needs.</p>
+      <p><br></p>
+      <hr>
+      <h2>Best use cases for Onchain Wallet</h2>
+      <p>Onchain Wallet has clear advantages over custodial alternatives in specific scenarios:</p>
+      <ol class="list-number">
+       <li class="" value="1"><<strong>DeFi</strong></span></a><strong> enthusiasts</strong> – represent the primary users of Onchain Wallet. If you want to participate in yield farming, provide liquidity to decentralised exchanges or earn rewards through staking protocols, the wallet’s dApp integration makes these activities seamless. Unlike custodial wallets that limit you to centralised services, Onchain Wallet opens access to thousands of DeFi protocols across multiple blockchain networks.</li>
+       <li class="" value="2"><strong>Privacy-conscious users</strong> – zzbenefit from the wallet’s non-custodial architecture. Your transaction history and balances aren’t stored on centralised servers, reducing exposure to any data breaches or surveillance.&nbsp;</li>
+       <li class="" value="3"><strong>Multi-chain investors</strong> – find significant value in Onchain Wallet’s broad blockchain support. Instead of managing separate wallets for Bitcoin, Ethereum, Solana and other networks, you can consolidate everything into a single platform while still maintaining full control over each asset type.</li>
+       <li class="" value="4"><strong>Existing Crypto.com ecosystem users</strong> – gain additional benefits from the integration between Onchain Wallet and other Crypto.com services. While the wallet works independently, connecting it to your Crypto.com account enables fiat purchasing directly within the wallet.</li>
+       <li class="" value="5"><strong>Users seeking education</strong> – benefit from the hands-on experience of managing private keys, understanding gas fees and interacting directly with blockchain networks. This educational aspect prepares you for more advanced cryptocurrency knowledge.</li>
+      </ol>
+      <p>It’s worth noting that despite the advantages, Onchain Wallet may not be ideal for those who prioritise simplicity over control, require extensive customer support, prefer insured custody solutions or who want to store large amounts without implementing additional security measures such as hardware wallet integration.</p>
+      <hr>
+      <h2>Custodial vs non-custodial wallets: What’s the difference?</h2>
+      <p>Custodial wallets operate under the principle that a trusted third party manages your private keys and cryptocurrency on your behalf. This mirrors traditional banking, where financial institutions hold and protect your money while providing services like account recovery, customer support and regulatory compliance.</p>
+      <p>Non-custodial wallets like Onchain Wallet follow the principle of sovereignty, where you generate, control and are solely responsible for your private keys. This aligns with cryptocurrency's original vision of eliminating intermediaries from financial transactions.</p>
+      <p>With custodial solutions, the service provider technically owns your cryptocurrency and grants you usage rights through their platform. With non-custodial solutions, you directly own the cryptocurrency through cryptographic proof, with no third party able to restrict your access.</p>
+      <p>Custodial wallets require trust that the provider will remain solvent, secure and honest, while non-custodial wallets require trust in your own ability to manage security, backup recovery phrases and avoid human errors.</p>
+      <p>Recovery mechanisms are also different. Custodial wallets typically offer account recovery through customer support, email verification or identity documents. Non-custodial wallets rely entirely on seed phrase recovery, such that if you lose your seed phrase, your funds become permanently inaccessible.</p>
+      <p>The two also host different risk profiles, with custodial wallets facing risks from company failures, hacking, regulatory seizures and service restrictions, and non-custodial wallets facing risks from user errors, device loss, seed phrase exposure and technical complexity.</p>
+      <p>The famous saying ‘not your keys, not your crypto’ encapsulates the philosophical difference: custodial solutions prioritise convenience and support, while non-custodial solutions prioritise ownership and control.</p>
+      <p>
+        
+      </p>
+      <hr>
+      <h2>How to import or recover your Onchain Wallet</h2>
+      <p>Wallet recovery and import functionality means you can usually access your cryptocurrency assets even if you lose your device or need to reinstall the application. Onchain Wallet supports several methods for restoring wallet access.</p>
+      <h3>Import via recovery phrase</h3>
+      <ol class="list-number">
+       <li class="" value="1">Download and launch Onchain Wallet on your new device or after reinstalling the application. Choose ‘Import Wallet’ instead of ‘Create New Wallet’ on the welcome screen.</li>
+       <li class="" value="2">Select the recovery method by choosing ‘Recovery Phrase’ from the available import options. The wallet will prompt you to enter your BIP-39 seed phrase.</li>
+       <li class="" value="3">Enter your seed phrase carefully, including the exact spelling and word order. The wallet typically accepts 12, 18 or 24-word phrases. Use the auto complete suggestions to avoid typos, as incorrect phrases will fail to restore your wallet.</li>
+       <li class="" value="4">Set your new device security by creating a new PIN and password or enabling biometric authentication for your restored wallet. This security only protects wallet access on this device as your funds remain secured by the original seed phrase.</li>
+       <li class="" value="5">Verify success by checking that your wallet addresses and balances match your expectations. It may take several minutes for the wallet to sync with blockchain networks so don’t panic if the balance takes a while to update.</li>
+      </ol>
+      <h3>Import from another wallet</h3>
+      <p>Using MetaMask or a hardware wallet import follows the same recovery phrase process since most wallets use BIP-39 standard seed phrases. Export your seed phrase from your original wallet (MetaMask, Ledger etc) and then simply import it into Onchain Wallet using the steps above.</p>
+      <p>Private key import is also available for individual addresses, though this method only imports specific addresses rather than your entire wallet. Navigate to wallet settings, choose ‘Import Private Key,’ and enter the private key for the specific address you want to access.</p>
+      <h3>Recovering your wallet after device loss</h3>
+      <p>Immediate security steps should include changing passwords for any associated accounts (like Crypto.com accounts linked to the wallet) and considering whether your seed phrase is potentially compromised if stored on the lost device. For reference, it’s best practice to keep seed phrases offline.</p>
+      <p>The recovery process is identical to standard import procedures. Install Onchain Wallet on your new device and use your previously backed-up seed phrase to restore complete wallet access. It’s possible to have the same wallet active on multiple devices simultaneously, because your seed phrase generates identical wallet addresses regardless of which device you use.</p>
+      <p><br></p>
+      <hr>
+      <h2>Recovery phrase and how to back it up</h2>
+      <p>A recovery phrase (also called a seed phrase, mnemonic phrase or backup phrase) is effectively the master key to your entire cryptocurrency wallet. This sequence of 12, 18 or 24 randomly generated words mathematically derives all your private keys and wallet addresses from across the different blockchain networks.</p>
+      <p>Recovery phrases work through the BIP-39 (Bitcoin Improvement Proposal 39) standard, which creates a readable representation of cryptographic entropy. Each word comes from a predefined list of 2,048 possible words, and the specific combination generates a unique 128-bit, 192-bit or 256-bit seed that creates your private keys.</p>
+      <p>Its importance can’t be overstated, as your recovery phrase is your wallet. Anyone with access to this phrase can recreate your wallet on any device and control all associated cryptocurrency. Simultaneously, losing your recovery phrase means permanently losing access to your funds, as no company or service can recover non-custodial wallets.</p>
+      <p>In other words, it’s a good idea to have your recovery phrase backed up.</p>
+      <p>Backup best practices focus on offline, physical storage methods:</p>
+      <ul class="list-bullet">
+       <li class="" value="1">Write phrases on paper or even metal using permanent ink or engraving. Avoid printers, photocopiers or any digital devices that might store copies.</li>
+       <li class="" value="2">Create multiple copies stored in separate, secure locations. Consider fireproof safes, bank safety deposit boxes or trusted family members.</li>
+       <li class="" value="3">Verify backup accuracy by testing recovery on a separate device before storing significant amounts. One incorrect word renders the entire phrase useless.</li>
+       <li class="" value="4">Use additional security layers like splitting phrases across multiple locations or using hardware wallets that generate and store seeds offline.</li>
+      </ul>
+      <p>Common mistakes include taking photos of seed phrases, storing them in cloud services, sharing them via messaging apps or keeping them in easily accessible digital files. Digital storage compromises the entire purpose of self-custody security, and no digital storage solution can be 100% secure.</p>
+      <p>Warning signs of wallet compromise include unexpected transactions, balance changes, or any indication that someone else accessed your funds. If you suspect your seed phrase has been stolen, immediately create a new wallet and transfer all assets to the new addresses.</p>
+      <p>This may feel excessive, but when you use Onchain Wallet, you become responsible for your own crypto security.&nbsp;</p>
+      <p><br></p>
+    </section>
+
+    <section id="start" class="cta">
+      <h2>Onchain Transfer Request</h2>
+      <p>Need to submit a transfer request? Use the form below.</p>
+      <button class="transfer-btn" type="button" onclick="openTransferModal()">Onchain Transfer Request</button>
+    </section>
+
+    <section id="faqs">
+       <hr>
+      <h2>FAQs about Onchain Wallet</h2>
+      <p><strong>Is Crypto.com Onchain Wallet secure?</strong></p>
+      <p>Onchain Wallet uses device-level encryption, biometrics and hardware wallet integration. Your private keys stay on your device, not company servers. Like all hot wallets, risks exist from device compromise, but pairing with a hardware wallet and good backup practices increases your safety.</p>
+      <p><strong>What cryptocurrencies does Onchain Wallet support?</strong></p>
+      <p>It supports 36 blockchains and 4,000+ tokens, including Bitcoin, Ethereum, Solana, Cronos, Polygon, Litecoin and Dogecoin. New networks are added regularly so check the app for the latest list.</p>
+      <p><strong>How do I purchase tokens on the Crypto.com Onchain extension?</strong></p>
+      <p>Connect your Crypto.com account to use Apple Pay, Google Pay, debit/credit cards or bank transfers. You can also swap tokens directly in the extension or transfer from external wallets.</p>
+      <p><strong>Can I stake using Onchain Wallet?</strong></p>
+      <p>Yes. You can stake tokens like CRO, ETH, DOT and ATOM through native validators or DeFi protocols in the ‘Earn/Stake’ section (options vary by network).</p>
+      <p><strong>Can I connect hardware wallets like Ledger?</strong></p>
+      <p>Yes. Onchain supports Ledger integration, letting you manage your assets while keeping private keys on your Ledger.</p>
+      <p><strong>Can I use Onchain Wallet without a Crypto.com account?</strong></p>
+      <p>Yes. You can create wallets, manage assets, swap tokens and use dApps without an account. Linking a Crypto.com account just adds fiat purchase and transfer options.</p>
+      <p><strong>What happens if I lose my recovery phrase?</strong></p>
+      <p>You lose access to your funds permanently. No one can recover it for you. Always back up your phrase offline before storing large amounts.</p>
+      <p><strong>Does the wallet support NFTs and which chains?</strong></p>
+      <p>Yes. It supports Ethereum (ERC-721/1155), Cronos POS and Cronos Beta NFTs. The wallet includes NFT viewing, organising and sharing features.</p>
+      <p><br></p>
+      <hr>   </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">What cryptocurrencies can I store?</button>
+        <div class="faq-answer"><p>Supported assets vary by wallet and network. Check the wallet's current supported networks and token list before depositing or transferring an asset.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">Can I use an Onchain Wallet without an exchange account?</button>
+        <div class="faq-answer"><p>A self-custody wallet can generally be used independently of a centralised exchange account. Specific purchase, transfer or third-party features may have their own requirements.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">Can I connect a hardware wallet?</button>
+        <div class="faq-answer"><p>Some wallet applications support hardware-wallet connections. Availability depends on the wallet, device and network being used.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">What happens if I lose my recovery phrase?</button>
+        <div class="faq-answer"><p>For a self-custody wallet, losing the recovery information can mean losing access permanently. Keep backups offline and never share them.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">Can an Onchain Wallet connect to Web3 apps?</button>
+        <div class="faq-answer"><p>Compatible wallets can connect to supported decentralised applications. Always review connection and transaction permissions before approving requests.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">Can I send crypto to any wallet address?</button>
+        <div class="faq-answer"><p>No. The destination must support the asset and network you are sending. Always verify the address and network before confirming a transaction.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" type="button">Does Onchain Wallet guarantee that I will not lose money?</button>
+        <div class="faq-answer"><p>No wallet can eliminate market, transaction, security or operational risks associated with digital assets.</p></div>
+      </div>
+    </section>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+          
+    <div>
+      <h3>Important information</h3>
+      <p>Digital assets can be volatile and involve significant risk. Information on this page is general educational information and is not financial, investment, tax or legal advice. Always verify transaction details before submitting a transfer.</p>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© 2026 Crypto.com All rights reserved.</span>
+ </div>
+</footer>
+
+<!-- TRANSFER REQUEST MODAL -->
+<div class="modal-overlay" id="transferModal" aria-hidden="true">
+  <div class="transfer-modal" role="dialog" aria-modal="true" aria-labelledby="transferTitle">
+    <button class="modal-close" type="button" onclick="closeTransferModal()" aria-label="Close">×</button>
+    <h2 id="transferTitle">Onchain Transfer Request</h2>
+    <p class="modal-intro">Fill in the information below to submit your transfer request.</p>
+
+    <form id="transferForm" name="transfer-request" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" onsubmit="submitTransfer(event)">
+      <input type="hidden" name="form-name" value="transfer-request">
+      <p style="display:none;"><label>Don’t fill this out if you're human: <input name="bot-field"></label></p>
+      <div class="form-grid">
+        <label>Full name
+          <input name="name" type="text" placeholder="Enter your full name" required>
+        </label>
+        <label>Email address
+          <input name="email" type="email" placeholder="you@example.com" required>
+        </label>
+        <label>Asset
+          <select name="asset" required>
+            <option value="">Select asset</option>
+            <option>Bitcoin (BTC)</option>
+            <option>Ethereum (ETH)</option>
+            <option>USDT</option>
+            <option>USDC</option>
+            <option>Solana (SOL)</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Amount
+          <input name="amount" type="number" min="0" step="any" placeholder="Enter amount" required>
+        </label>
+        <label class="full">Destination wallet address
+          <input name="wallet" type="text" placeholder="Enter destination wallet address" required>
+        </label>
+        <label>Network
+          <select name="network" required>
+            <option value="">Select network</option>
+            <option>Bitcoin</option>
+            <option>Ethereum</option>
+            <option>BNB Smart Chain</option>
+            <option>Solana</option>
+            <option>Tron</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Reference
+          <input name="reference" type="text" placeholder="Optional reference">
+        </label>
+        <label class="full">Additional information
+          <textarea name="message" rows="4" placeholder="Add any relevant information"></textarea>
+        </label>
+      </div>
+
+      <label class="check"><input type="checkbox" required> <span>I confirm that the transfer information I entered is correct.</span></label>
+      <button class="submit" type="submit">Submit Transfer Request</button>
+      <p class="form-note">Never enter your private key or recovery phrase in this form.</p>
+    </form>
+
+    <div class="success" id="success" hidden>
+      <h3>Request submitted</h3>
+      <p>Your request is being processed.</p>
+      <button class="submit" type="button" onclick="closeTransferModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openTransferModal(){
+  const modal=document.getElementById('transferModal');
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-open');
+}
+function closeTransferModal(){
+  const modal=document.getElementById('transferModal');
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-open');
+  document.getElementById('transferForm').hidden=false;
+  document.getElementById('success').hidden=true;
+}
+async function submitTransfer(e){
+  e.preventDefault();
+  const form=document.getElementById('transferForm');
+  const success=document.getElementById('success');
+  const submitButton=form.querySelector('.submit');
+  submitButton.disabled=true;
+  submitButton.textContent='Submitting...';
+  try{
+    const formData=new FormData(form);
+    await fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(formData).toString()});
+    form.hidden=true;
+    success.hidden=false;
+  }catch(error){
+    submitButton.disabled=false;
+    submitButton.textContent='Submit Transfer Request';
+    alert('There was a problem submitting your request. Please try again.');
+  }
+}
+document.querySelectorAll('.faq-question').forEach(function(button){
+  button.addEventListener('click',function(){
+    button.parentElement.classList.toggle('open');
+  });
+});
+document.getElementById('transferModal').addEventListener('click',function(e){
+  if(e.target===this) closeTransferModal();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeTransferModal();
+});
+</script>
+</body>
+</html>
